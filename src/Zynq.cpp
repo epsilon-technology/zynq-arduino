@@ -40,7 +40,39 @@ void ZynqClass::begin(
 
   configTime(0, 0, "pool.ntp.org", "time.google.com");
 
-  ensureWifi();
+  // Inisialisasi WiFi
+  WiFi.mode(WIFI_STA);
+  #if defined(ESP32)
+    WiFi.setAutoReconnect(true);
+  #elif defined(ESP8266)
+    WiFi.setAutoConnect(true);
+    WiFi.setAutoReconnect(true);
+  #endif
+
+  Serial.println();
+  Serial.print("[Zynq] Menghubungkan ke WiFi: ");
+  Serial.println(_ssid);
+
+  WiFi.begin(_ssid, _wifiPassword);
+
+  // Tunggu koneksi awal (maksimal 15 detik) agar programmer langsung melihat statusnya
+  unsigned long startWait = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startWait < 15000) {
+    delay(400);
+    Serial.print(".");
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println(" Terhubung!");
+    Serial.print("[Zynq] IP Address: ");
+    Serial.println(WiFi.localIP());
+    ensureMqtt();
+  } else {
+    Serial.println();
+    Serial.print("[Zynq] Peringatan: Belum terhubung ke WiFi (status: ");
+    Serial.print(WiFi.status());
+    Serial.println("). Akan dicoba kembali di background...");
+  }
 }
 
 void ZynqClass::registerAction(uint8_t pin, ZynqActionEntry::HandlerType type, void* fn) {
@@ -267,13 +299,15 @@ void ZynqClass::ensureWifi() {
   if (WiFi.status() == WL_CONNECTED) return;
 
   static unsigned long lastCheck = 0;
-  if (millis() - lastCheck < 3000) return;
-  lastCheck = millis();
+  unsigned long now = millis();
+  // Beri jeda minimal 15 detik agar proses handshake DHCP tidak terpotong-potong
+  if (now - lastCheck < 15000) return;
+  lastCheck = now;
 
   if (WiFi.status() != WL_CONNECTED && _ssid) {
-    Serial.print("[Zynq] Menyambungkan WiFi: ");
+    Serial.print("[Zynq] Menghubungkan ulang ke WiFi: ");
     Serial.println(_ssid);
-    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
     WiFi.begin(_ssid, _wifiPassword);
   }
 }
