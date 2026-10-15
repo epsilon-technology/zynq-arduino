@@ -2,15 +2,15 @@
  * Contoh ESP8266 (NodeMCU / Wemos D1 Mini) — Zynq IoT Platform (DX Sempurna, Nol Magic).
  */
 
-#define ZYNQ_PROJECT "prj_01M48RGF7P60NYEEXVF9KJ8KCK"
-#define ZYNQ_DEVICE  "dev_01M48RGF7P60NYEEXVF9KJ8KCK"
-#define ZYNQ_TOKEN   "zxt_abcdef0123456789..."
-
 #include <ESP8266WiFi.h>
 #include <Zynq.h>
 
 const char* ssid     = "NAMA_WIFI_ANDA";
 const char* password = "PASSWORD_WIFI";
+
+const char* projectId   = "prj_01M48RGF7P60NYEEXVF9KJ8KCK";
+const char* deviceId    = "dev_01M48RGF7P60NYEEXVF9KJ8KCK";
+const char* deviceToken = "zxt_abcdef0123456789...";
 
 const int RELAY_PIN = D1;
 
@@ -33,7 +33,8 @@ void setup() {
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
 
-  Zynq.begin(ssid, password);
+  // Hubungkan ke WiFi dan Zynq Cloud
+  Zynq.begin(ssid, password, projectId, deviceId, deviceToken);
 
   Zynq.on(V1, kontrolRelay);
   Zynq.every(3000, bacaSensor); // Kirim tiap 3 detik

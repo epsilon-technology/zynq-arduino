@@ -110,11 +110,6 @@ public:
   );
 
   /**
-   * Inisialisasi cepat bila kredensial sudah di-#define
-   */
-  void begin(const char* ssid, const char* wifiPassword);
-
-  /**
    * 1. Zynq.on(pin, fungsi)
    * Daftarkan fungsi untuk menangani perintah dari Dashboard (Aktuator).
    * Otomatis menandai VPin sebagai Kontrol di Dashboard!

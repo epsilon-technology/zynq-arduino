@@ -70,15 +70,17 @@ Library Zynq membutuhkan dependensi MQTT **PubSubClient** oleh *Nick O'Leary*:
 Kodingan di bawah menghubungkan ESP32 ke WiFi, membaca sensor suhu & kelembaban setiap 2 detik, serta mengontrol lampu relay dari dashboard web Zynq:
 
 ```cpp
-#define ZYNQ_PROJECT "prj_01M48RGF7P60NYEEXVF9KJ8KCK"
-#define ZYNQ_DEVICE  "dev_01M48RGF7P60NYEEXVF9KJ8KCK"
-#define ZYNQ_TOKEN   "zxt_abcdef0123456789..."
-
 #include <WiFi.h>
 #include <Zynq.h>
 
+// 1. Konfigurasi WiFi
 const char* ssid     = "NAMA_WIFI_ANDA";
 const char* password = "PASSWORD_WIFI";
+
+// 2. Kredensial Perangkat Zynq (Salin dari Dashboard https://zynq.epsitech.id)
+const char* projectId   = "prj_01M48RGF7P60NYEEXVF9KJ8KCK";
+const char* deviceId    = "dev_01M48RGF7P60NYEEXVF9KJ8KCK";
+const char* deviceToken = "zxt_abcdef0123456789...";
 
 const int RELAY_PIN = 2; // Pin fisik relay / LED pada board
 
@@ -117,8 +119,8 @@ void setup() {
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
 
-  // Hubungkan ke WiFi & Zynq Cloud (Port 8883 TLS)
-  Zynq.begin(ssid, password);
+  // Hubungkan ke WiFi & Zynq Cloud (Port 8883 TLS) dengan kredensial lengkap:
+  Zynq.begin(ssid, password, projectId, deviceId, deviceToken);
 
   // Daftarkan listener perintah aktuator (Cloud -> ESP32)
   Zynq.on(V2, kontrolRelay);
@@ -145,14 +147,10 @@ void loop() {
 
 ## 📖 Panduan Lengkap API
 
-### 1. `Zynq.begin(...)`
+### 1. `Zynq.begin(ssid, password, projectId, deviceId, deviceToken)`
 Menginisialisasi modul WiFi, enkripsi TLS port 8883, dan autentikasi token perangkat ke Zynq Broker.
 ```cpp
-// Format Lengkap:
 Zynq.begin(ssid, password, projectId, deviceId, deviceToken);
-
-// Format Cepat (bila ZYNQ_PROJECT, ZYNQ_DEVICE, & ZYNQ_TOKEN sudah di-#define):
-Zynq.begin(ssid, password);
 ```
 
 ### 2. `Zynq.on(pin, callback)`

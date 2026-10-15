@@ -43,14 +43,6 @@ void ZynqClass::begin(
   ensureWifi();
 }
 
-void ZynqClass::begin(const char* ssid, const char* wifiPassword) {
-  #if defined(ZYNQ_PROJECT) && defined(ZYNQ_DEVICE) && defined(ZYNQ_TOKEN)
-    begin(ssid, wifiPassword, ZYNQ_PROJECT, ZYNQ_DEVICE, ZYNQ_TOKEN);
-  #else
-    Serial.println("[Zynq] Error: Gunakan begin(ssid, pass, projectId, deviceId, token) atau #define kredensial ZYNQ_*");
-  #endif
-}
-
 void ZynqClass::registerAction(uint8_t pin, ZynqActionEntry::HandlerType type, void* fn) {
   if (_actionCount >= MAX_ACTIONS || fn == nullptr) return;
 
