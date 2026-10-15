@@ -3,14 +3,16 @@
 # ⚡ Zynq IoT — Arduino C++ Library
 
 **Official, high-performance, and developer-friendly IoT library for ESP32 and ESP8266.**  
-Connect your hardware to the **Zynq IoT Cloud Platform** with zero friction, zero magic, and instant auto-discovery.
+Connect your hardware to the [**Zynq IoT Cloud Platform (zynq.epsitech.id)**](https://zynq.epsitech.id) with zero friction, zero magic, and instant auto-discovery.
 
+[![Platform](https://img.shields.io/badge/Platform-zynq.epsitech.id-7C3AED?logo=google-cloud&logoColor=white)](https://zynq.epsitech.id)
 [![Arduino Library](https://img.shields.io/badge/Arduino-Library-00979C?logo=arduino&logoColor=white)](https://www.arduino.cc/)
 [![ESP32](https://img.shields.io/badge/Hardware-ESP32-E7352C?logo=espressif&logoColor=white)](https://www.espressif.com/)
 [![ESP8266](https://img.shields.io/badge/Hardware-ESP8266-41B883?logo=espressif&logoColor=white)](https://www.espressif.com/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/badge/Version-1.0.0-emerald)](https://github.com/epsilon-technology/zynq-arduino)
 
+[🌐 Web Platform](https://zynq.epsitech.id) •
 [Fitur Utama](#-fitur-utama) •
 [Cara Instalasi](#-cara-instalasi) •
 [Contoh Cepat](#-contoh-cepat-esp32) •
@@ -36,6 +38,13 @@ Sebagian besar library IoT memaksakan terlalu banyak *macro magic* yang membingu
 ---
 
 ## 📦 Cara Instalasi
+
+### 0. Dapatkan Kredensial di Dashboard Zynq
+1. Buka dan login ke platform di [**https://zynq.epsitech.id**](https://zynq.epsitech.id).
+2. Buat Project & tambahkan Perangkat baru untuk mendapatkan `projectId`, `deviceId`, dan `deviceToken`.
+3. Pada halaman detail perangkat (tab **Hubungkan**), Anda juga bisa langsung menyalin sketsa kode yang sudah terisi otomatis!
+
+---
 
 ### 1. Prasyarat: Pasang Library `PubSubClient`
 Library Zynq membutuhkan dependensi MQTT **PubSubClient** oleh *Nick O'Leary*:
