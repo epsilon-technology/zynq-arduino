@@ -105,7 +105,7 @@ public:
     const char* projectId,
     const char* deviceId,
     const char* deviceToken,
-    const char* brokerHost = "zynq-broker.epsitech.id",
+    const char* brokerHost = "zynq-mqtt.epsitech.id",
     uint16_t brokerPort = 8883
   );
 

@@ -10,7 +10,7 @@ Connect your hardware to the [**Zynq IoT Cloud Platform (zynq.epsitech.id)**](ht
 [![ESP32](https://img.shields.io/badge/Hardware-ESP32-E7352C?logo=espressif&logoColor=white)](https://www.espressif.com/)
 [![ESP8266](https://img.shields.io/badge/Hardware-ESP8266-41B883?logo=espressif&logoColor=white)](https://www.espressif.com/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/Version-1.0.0-emerald)](https://github.com/epsilon-technology/zynq-arduino)
+[![Release](https://img.shields.io/badge/Version-1.0.1-emerald)](https://github.com/epsilon-technology/zynq-arduino)
 
 [🌐 Web Platform](https://zynq.epsitech.id) •
 [Fitur Utama](#-fitur-utama) •
