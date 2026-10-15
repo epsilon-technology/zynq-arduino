@@ -1,0 +1,17 @@
+# Compiled binaries
+*.o
+*.a
+*.bin
+*.hex
+*.elf
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.bak
+*~
+
+# Operating System files
+.DS_Store
+Thumbs.db
