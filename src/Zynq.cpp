@@ -338,6 +338,11 @@ bool ZynqClass::ensureMqtt() {
     _mqtt.publish(_topicStatus.c_str(), "{\"online\":true}", true);
     _mqtt.subscribe(_topicCmd.c_str(), 1);
 
+    // Subscribe wildcard state per-pin — broker kirim retained state saat boot
+    // sehingga relay/kontrol langsung restore ke nilai terakhir (masalah 2).
+    String stateWildcard = "v1/" + _projectId + "/" + _deviceId + "/state/#";
+    _mqtt.subscribe(stateWildcard.c_str(), 1);
+
     syncVpins();
     return true;
   } else {
@@ -393,7 +398,52 @@ void ZynqClass::handleMessage(char* topic, byte* payload, unsigned int length) {
   buffer[length] = '\0';
 
   String msg = String(buffer);
+  String topicStr = String(topic);
 
+  // === STATE RETAINED (masalah 2 — restore saat boot) ===
+  // Topic: v1/{pid}/{did}/state/{vpin}  Payload: {"val":true,"ts":...}
+  // Device menerima retained state saat baru connect → apply tanpa ACK.
+  if (topicStr.indexOf("/state/") >= 0) {
+    String valStr = extractJsonValue(msg, "\"val\"");
+    // Ekstrak vpin dari topic: .../state/v2
+    int stateIdx = topicStr.indexOf("/state/");
+    String pinStr = topicStr.substring(stateIdx + 7);
+    
+    if (valStr.length() > 0 && pinStr.length() > 0) {
+      uint8_t pinNum = parsePinNumber(pinStr.c_str());
+      ZynqParam param;
+      if (valStr.equalsIgnoreCase("true")) {
+        param.boolVal = true; param.numVal = 1.0; param.isBoolean = true;
+      } else if (valStr.equalsIgnoreCase("false")) {
+        param.boolVal = false; param.numVal = 0.0; param.isBoolean = true;
+      } else {
+        param.numVal = valStr.toDouble();
+        param.boolVal = (param.numVal != 0.0);
+        param.isBoolean = false;
+      }
+
+      // Apply state restore: panggil handler tanpa ACK (bukan command dari user)
+      for (size_t i = 0; i < _actionCount; i++) {
+        if (_actions[i].pin == pinNum) {
+          if (_actions[i].type == ZynqActionEntry::TYPE_INT && _actions[i].intFn) {
+            _actions[i].intFn(param.asInt());
+          } else if (_actions[i].type == ZynqActionEntry::TYPE_FLOAT && _actions[i].floatFn) {
+            _actions[i].floatFn(param.asFloat());
+          } else if (_actions[i].type == ZynqActionEntry::TYPE_PARAM && _actions[i].paramFn) {
+            _actions[i].paramFn(param);
+          }
+          break;
+        }
+      }
+      Serial.print("[Zynq] State restore v");
+      Serial.print(pinNum);
+      Serial.print(" = ");
+      Serial.println(valStr);
+    }
+    return;
+  }
+
+  // === COMMAND (dari dashboard) ===
   // Parse Command ID, VPin, dan Value secara aman terhadap berbagai spasi JSON
   String cmdId = extractJsonString(msg, "\"id\"");
   String pinStr = extractJsonString(msg, "\"vpin\"");
@@ -439,11 +489,17 @@ void ZynqClass::handleMessage(char* topic, byte* payload, unsigned int length) {
       _mqtt.publish(_topicAck.c_str(), ackPayload.c_str());
     }
 
-    // Sync balik status terkini
+    // Sync balik status terkini (data echo — memicu clearPending di dashboard)
     if (param.isBoolean) {
       send(pinNum, param.boolVal);
     } else {
       send(pinNum, param.numVal);
     }
+
+    // Publish retained state per-pin (masalah 2 — persistensi setelah reboot)
+    // Broker simpan nilai terakhir; saat device boot → subscribe state/# → restore.
+    String stateTopicStr = "v1/" + _projectId + "/" + _deviceId + "/state/v" + String(pinNum);
+    String statePayload = "{\"val\":" + valStr + ",\"ts\":" + String(currentTimestamp()) + "}";
+    _mqtt.publish(stateTopicStr.c_str(), statePayload.c_str(), 1, true);
   }
 }
